@@ -25,8 +25,25 @@ public class ShoppingBasketTest {
     }
 
     @Test
+    public void testPrice_that_bogo_free_offer_applied_to_even_items_only() {
+        List<String> duplicateItemsButOddNumbered = List.of("Melons", "Melons", "Bananas", "Melons");
+        assertThat(basket.calculateInPence(duplicateItemsButOddNumbered)).isEqualTo(120);
+    }
+
+    @Test
+    public void testPrice_that_bogo_free_offer_not_applied_to_Bananas() {
+        List<String> duplicateItemsButOddNumbered = List.of("Bananas", "Melons", "Bananas", "Limes");
+        assertThat(basket.calculateInPence(duplicateItemsButOddNumbered)).isEqualTo(105);
+    }
+
+    @Test
     public void testPrice_with_3For2_offer() {
-        assertThat(basket.calculateInPence(List.of("Limes", "Melons", "Limes", "Banana", "Limes"))).isEqualTo(100);
+        assertThat(basket.calculateInPence(List.of("Limes", "Melons", "Limes", "Bananas", "Limes"))).isEqualTo(100);
+    }
+
+    @Test
+    public void testPrice_that_3For2_offer_only_applied_to_Triplet_Limes() {
+        assertThat(basket.calculateInPence(List.of("Limes", "Melons", "Limes", "Limes", "Limes", "Bananas", "Limes"))).isEqualTo(130);
     }
 
     /**

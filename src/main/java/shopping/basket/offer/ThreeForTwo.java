@@ -5,28 +5,29 @@ import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
 import shopping.basket.item.Item;
+import shopping.basket.item.Lime;
 import shopping.basket.item.Melon;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class BuyOneGetOne implements Offer {
+public class ThreeForTwo implements Offer {
 
     private List<Item> items;
 
-    public BuyOneGetOne(final List<Item> items) {
+    public ThreeForTwo(final List<Item> items) {
         this.items = items;
     }
 
 
     @Override
     public Integer apply(final Integer initialCost) {
-        Stream<Map.Entry<Item, Long>> qualifyItems = getQualifyItems();
+        Stream<Map.Entry<Item, Long>> qualifyingItems = getQualifyItems();
 
-        Integer reducedCost = qualifyItems.reduce(initialCost, (cost, itemEntry) -> {
+        Integer reducedCost = qualifyingItems.reduce(initialCost, (cost, itemEntry) -> {
                     int count = itemEntry.getValue().intValue();
-                    int freeItems = count / 2;
+                    int freeItems = count / 3;
 
                     Integer takeAway = itemEntry.getKey().getPriceInPence() * freeItems;
                     return cost - takeAway;
@@ -40,9 +41,8 @@ public class BuyOneGetOne implements Offer {
         Map<Item, Long> grouped = items.stream().collect(
                 groupingBy(identity(), counting()));
 
-
         return grouped.entrySet()
                 .stream()
-                .filter(entry -> entry.getKey() instanceof Melon && entry.getValue() > 1);
+                .filter(entry -> entry.getKey() instanceof Lime && entry.getValue() >= 3);
     }
 }
