@@ -3,6 +3,7 @@
  */
 package shopping.basket;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -10,6 +11,12 @@ import org.junit.Test;
 
 import java.util.List;
 
+/**
+ * Apples are 35p each
+ * Bananas are 20p each
+ * Melons are 50p each, but are available as ‘buy one get one free’
+ * Limes are 15p each, but are available in a ‘three for the price of two’ offer
+ */
 public class ShoppingBasketTest {
 
     ShoppingBasket basket = new ShoppingBasket();
@@ -25,13 +32,13 @@ public class ShoppingBasketTest {
     }
 
     @Test
-    public void testPrice_that_bogo_free_offer_applied_to_even_items_only() {
+    public void that_bogo_free_offer_applied_to_even_items_only() {
         List<String> duplicateItemsButOddNumbered = List.of("Melons", "Melons", "Bananas", "Melons");
         assertThat(basket.calculateInPence(duplicateItemsButOddNumbered)).isEqualTo(120);
     }
 
     @Test
-    public void testPrice_that_bogo_free_offer_not_applied_to_Bananas() {
+    public void that_bogo_free_offer_not_applied_to_Bananas() {
         List<String> duplicateItemsButOddNumbered = List.of("Bananas", "Melons", "Bananas", "Limes");
         assertThat(basket.calculateInPence(duplicateItemsButOddNumbered)).isEqualTo(105);
     }
@@ -42,15 +49,34 @@ public class ShoppingBasketTest {
     }
 
     @Test
-    public void testPrice_that_3For2_offer_only_applied_to_Triplet_Limes() {
+    public void that_3For2_offer_only_applied_to_Triplet_Limes() {
         assertThat(basket.calculateInPence(List.of("Limes", "Melons", "Limes", "Limes", "Limes", "Bananas", "Limes"))).isEqualTo(130);
     }
 
-    /**
-     * TODO - complete this test
-     */
     @Test
-    public void test_appropriateError_When_NullShoppingBasket() {
-        assertThatThrownBy(() -> basket.calculateInPence(null)).isInstanceOf(NullPointerException.class);
+    public void that_3For2_offer_not_applied_to_other_triplet_fruits() {
+        assertThat(basket.calculateInPence(List.of("Bananas", "Melons", "Bananas", "Bananas", "Limes", "Limes"))).isEqualTo(140);
     }
+
+//    ****EDGE Cases****
+
+    @Test
+    public void testPrice_when_empty_shopping_basket() {
+        assertThat(basket.calculateInPence(emptyList())).isEqualTo(0);
+    }
+
+    @Test
+    public void test_appropriateError_when_NullShoppingBasket() {
+        assertThatThrownBy(() -> basket.calculateInPence(null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("The list containing item names must not be null");
+    }
+
+    @Test
+    public void test_appropriateError_when_unrecognised_fruit_in_basket() {
+        assertThatThrownBy(() -> basket.calculateInPence(List.of("Bananas", "Melons", "Oranges")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Item Oranges not recognised");
+    }
+
 }

@@ -5,6 +5,7 @@ package shopping.basket;
 
 import static java.util.stream.Collectors.toList;
 
+import com.google.common.base.Preconditions;
 import shopping.basket.item.Item;
 import shopping.basket.item.ItemsFactory;
 import shopping.basket.offer.OfferFactory;
@@ -16,6 +17,8 @@ import java.util.stream.Stream;
 
 public class ShoppingBasket {
     public Integer calculateInPence(final List<String> itemNames) {
+
+        Preconditions.checkNotNull(itemNames, "The list containing item names must not be null");
         List<Item> items = itemNames.stream()
                 .map(ItemsFactory::toItem)
                 .collect(toList());
@@ -24,7 +27,7 @@ public class ShoppingBasket {
                 .map(Item::getPriceInPence)
                 .reduce(Integer::sum);
 
-        Integer initialCost = result.get(); // TODO idiomatic use of Optional?
+        Integer initialCost = result.orElse(0);
         Integer finalCost = OfferFactory.offers(items).reduce(
                 initialCost,
                 (cost, offer) -> offer.apply(cost),
